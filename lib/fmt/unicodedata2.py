@@ -1,3 +1,10 @@
+# downloaded from https://gist.github.com/2204527
+# described/recommended here:
+#
+#   http://stackoverflow.com/questions/9868792/find-out-the-unicode-script-of-a-character
+#
+
+from __future__ import print_function
 from unicodedata import *
 
 script_data = {
@@ -599,7 +606,7 @@ def _compile_scripts_txt():
             idx.append((int(a, 16), int(b or a, 16), names.index(name), cats.index(cat)))
     idx.sort()
 
-    print 'script_data = {\n"names":%s,\n"cats":%s,\n"idx":[\n%s\n]}' % (
+    print('script_data = {\n"names":%s,\n"cats":%s,\n"idx":[\n%s\n]}' % (
         '\n'.join(textwrap.wrap(repr(names), 80)),
         '\n'.join(textwrap.wrap(repr(cats), 80)),
-        '\n'.join(textwrap.wrap(', '.join('(0x%x,0x%x,%d,%d)' % c for c in idx), 80)))        
+        '\n'.join(textwrap.wrap(', '.join('(0x%x,0x%x,%d,%d)' % c for c in idx), 80))))        
