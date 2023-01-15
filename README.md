@@ -1,13 +1,17 @@
-*wttr.in — the right way to check the weather!*
+
+*wttr.in — the right way to ~check~ `curl` the weather!*
 
 wttr.in is a console-oriented weather forecast service that supports various information
 representation methods like terminal-oriented ANSI-sequences for console HTTP clients
 (curl, httpie, or wget), HTML for web browsers, or PNG for graphical viewers.
 
-wttr.in uses [wego](http://github.com/schachmat/wego) for visualization
-and various data sources for weather forecast information.
+Originally started as a small project, a wrapper for [wego](https://github.com/schachmat/wego),
+intended to demonstrate the power of the console-oriented services,
+*wttr.in* became a popular weather reporting service, handling tens of millions of queries daily.
 
-You can see it running here: [wttr.in](http://wttr.in).
+You can see it running here: [wttr.in](https://wttr.in).
+
+[Documentation](https://wttr.in/:help) | [Usage](https://github.com/chubin/wttr.in#usage) | [One-line output](https://github.com/chubin/wttr.in#one-line-output) | [Data-rich output format](https://github.com/chubin/wttr.in#data-rich-output-format-v2) | [Map view](https://github.com/chubin/wttr.in#map-view-v3) | [Output formats](https://github.com/chubin/wttr.in#different-output-formats) | [Moon phases](https://github.com/chubin/wttr.in#moon-phases) | [Internationalization](https://github.com/chubin/wttr.in#internationalization-and-localization) | [Windows issues](https://github.com/chubin/wttr.in#windows-users) | [Installation](https://github.com/chubin/wttr.in#installation)
 
 ## Usage
 
@@ -25,7 +29,7 @@ You can access the service from a shell or from a Web browser like this:
 
 Here is an actual weather report for your location (it's live!):
 
-![Weather Report](http://wttr.in/MyLocation.png?)
+![Weather Report](https://wttr.in/San-Francisco.png?)
 
 (It's not your actual location - GitHub's CDN hides your real IP address with its own IP address,
 but it's still a live weather report in your language.)
@@ -33,7 +37,7 @@ but it's still a live weather report in your language.)
 Or in PowerShell:
 
 ```PowerShell
-Invoke-RestMethod http://wttr.in
+Invoke-RestMethod https://wttr.in
 ```
 
 Want to get the weather information for a specific location? You can add the desired location to the URL in your
@@ -70,7 +74,7 @@ You can also use IP-addresses (direct) or domain names (prefixed with `@`) to sp
     $ curl wttr.in/@github.com
     $ curl wttr.in/@msu.ru
 
-To get detailed information online, you can access the [/:help](http://wttr.in/:help) page:
+To get detailed information online, you can access the [/:help](https://wttr.in/:help) page:
 
     $ curl wttr.in/:help
 
@@ -78,10 +82,18 @@ To get detailed information online, you can access the [/:help](http://wttr.in/:
 ### Weather Units
 
 By default the USCS units are used for the queries from the USA and the metric system for the rest of the world.
-You can override this behavior by adding `?u` or `?m` to a URL like this:
+You can override this behavior by adding `?u`, `?m` or `?M`   to a URL like this:
 
-    $ curl wttr.in/Amsterdam?u
-    $ curl wttr.in/Amsterdam?m
+    $ curl wttr.in/Amsterdam?u  # USCS (used by default in US)
+    $ curl wttr.in/Amsterdam?m  # metric (SI) (used by default everywhere except US)
+    $ curl wttr.in/Amsterdam?M  # metric (SI), but show wind speed in m/s
+
+If you have several options to pass, write them without delimiters in between for the one-letter options,
+and use `&` as a delimiter for the long options with values:
+
+    $ curl 'wttr.in/Amsterdam?m2&lang=nl'
+
+It would be a rough equivalent of `-m2 --lang nl` for the GNU CLI syntax.
 
 ## Supported output formats and views
 
@@ -94,7 +106,12 @@ wttr.in currently supports five output formats:
 * JSON for scripts and APIs;
 * Prometheus metrics for scripts and APIs.
 
-The ANSI and HTML formats are selected basing on the User-Agent string.
+The ANSI and HTML formats are selected based on the User-Agent string.
+
+To force plain text, which disables colors:
+
+    $ curl wttr.in/?T
+
 The PNG format can be forced by adding `.png` to the end of the query:
 
     $ wget wttr.in/Paris.png
@@ -128,6 +145,9 @@ You can embed a special wttr.in widget, that displays the weather condition for 
 
 ## One-line output
 
+One-line output format is convenient to be used to show weather info
+in status bar of different programs, such as *tmux*, *weechat*, etc.
+
 For one-line output format, specify additional URL parameter `format`:
 
 ```
@@ -157,21 +177,25 @@ To specify your own custom output format, use the special `%`-notation:
 ```
     c    Weather condition,
     C    Weather condition textual name,
+    x    Weather condition, plain-text symbol,
     h    Humidity,
     t    Temperature (Actual),
     f    Temperature (Feels Like),
     w    Wind,
     l    Location,
-    m    Moonphase 🌑🌒🌓🌔🌕🌖🌗🌘,
-    M    Moonday,
-    p    precipitation (mm),
-    P    pressure (hPa),
+    m    Moon phase 🌑🌒🌓🌔🌕🌖🌗🌘,
+    M    Moon day,
+    p    Precipitation (mm/3 hours),
+    P    Pressure (hPa),
+    u    UV index (1-12),
 
     D    Dawn*,
     S    Sunrise*,
     z    Zenith*,
     s    Sunset*,
-    d    Dusk*.
+    d    Dusk*,
+    T    Current time*,
+    Z    Local timezone.
 
 (*times are shown in the local timezone)
 ```
@@ -184,7 +208,13 @@ So, these two calls are the same:
     $ curl wttr.in/London?format="%l:+%c+%t\n"
     London: ⛅️ +7⁰C
 ```
-Keep in mind, that when using in `tmux.conf`, you have to escape `%` with `%`, i.e. write there `%%` instead of `%`.
+
+### tmux
+
+When using in `tmux.conf`, you have to escape `%` with `%`, i.e. write there `%%` instead of `%`.
+
+The output does not contain new line by default, when the %-notation is used, but it does contain it when preconfigured format (`1`,`2`,`3` etc.)
+are used. To have the new line in the output when the %-notation is used, use '\n' and single quotes when doing a query from the shell.
 
 In programs, that are querying the service automatically (such as tmux), it is better to use some reasonable update interval. In tmux, you can configure it with `status-interval`.
 
@@ -197,12 +227,39 @@ set -g status-right "$WEATHER ..."
 ```
 ![wttr.in in tmux status bar](https://wttr.in/files/example-tmux-status-line.png)
 
+### Weechat
+
+To embed in to an IRC ([Weechat](https://github.com/weechat/weechat)) client's existing status bar:
+
+```
+/alias add wttr /exec -pipe "/set plugins.var.python.text_item.wttr all" url:wttr.in/Montreal?format=%l:+%c+%f+%h+%p+%P+%m+%w+%S+%s
+/trigger add wttr timer 60000;0;0 "" "" "/wttr"
+/eval /set weechat.bar.status.items ${weechat.bar.status.items},wttr
+/eval /set weechat.startup.command_after_plugins ${weechat.startup.command_after_plugins};/wttr
+```
+![wttr.in in weechat status bar](https://i.imgur.com/IyvbxjL.png)
+
+
+### conky
+
+Conky usage example:
+
+```
+${texeci 1800 curl wttr.in/kyiv_0pq_lang=uk.png 
+  | convert - -transparent black $HOME/.config/conky/out.png}
+${image $HOME/.config/conky/out.png -p 0,0}
+```
+
+![wttr.in in weechat status bar](https://user-images.githubusercontent.com/3875145/172178453-9e9ed9e3-9815-426a-9a21-afdd6e279fc8.png)
+
+### Emojis support
+
 To see emojis in terminal, you need:
 
 1. Terminal support for emojis (was added to Cairo 1.15.8);
 2. Font with emojis support.
 
-For the Emoji font, we recommend *Noto Color Emoji*, and a good alternative option would be the *Emoji One* font;
+For the emoji font, we recommend *Noto Color Emoji*, and a good alternative option would be the *Emoji One* font;
 both of them support all necessary emoji glyphs.
 
 Font configuration:
@@ -233,16 +290,19 @@ $ cat ~/.config/fontconfig/fonts.conf
 </fontconfig>
 ```
 
-(to apply the configuration, run `fc-cache -f -v`)
+(to apply the configuration, run `fc-cache -f -v`).
+
+In some cases, `tmux` and the terminal understanding of some emoji characters may differ, which may
+cause strange effects similar to that described in #579.
 
 ## Data-rich output format (v2)
 
 In the experimental data-rich output format, that is available under the view code `v2`,
 a lot of additional weather and astronomical information is available:
 
-* Temperature, and precepetation changes forecast throughout the days;
+* Temperature, and precipitation changes forecast throughout the days;
 * Moonphase for today and the next three days;
-* The current weather condition, temperature, humidity, windspeed and direction, pressure;
+* The current weather condition, temperature, humidity, wind speed and direction, pressure;
 * Timezone;
 * Dawn, sunrise, noon, sunset, dusk time for he selected location;
 * Precise geographical coordinates for the selected location.
@@ -304,7 +364,7 @@ or directly in browser:
 
 The map view currently supports three formats:
 
-* PNG (for browser and messangers);
+* PNG (for browser and messengers);
 * Sixel (terminal inline images support);
 * IIP (terminal with iterm2 inline images protocol support).
 
@@ -318,7 +378,7 @@ Terminal with inline images protocols support:
 | mlterm                |   X11     |   yes         |   Sixel   |
 | kitty                 |   X11     |   yes         |   Kitty   |
 | wezterm               |   X11     |   yes         |   IIP     |
-| aminal                |   X11     |   yes         |   Sixel   |
+| Darktile              |   X11     |   yes         |   Sixel   |
 | Jexer                 |   X11     |   yes         |   Sixel   |
 | GNOME Terminal        |   X11     |   [in-progress](https://gitlab.gnome.org/GNOME/vte/-/issues/253) |   Sixel   |
 | alacritty             |   X11     |   [in-progress](https://github.com/alacritty/alacritty/issues/910) |  Sixel   |
@@ -420,18 +480,18 @@ in the full-output mode:
 
     $ curl wttr.in/Moon
 
-Get the Moon phase for a particular date by adding `@YYYY-MM-DD`:
+Get the moon phase for a particular date by adding `@YYYY-MM-DD`:
 
     $ curl wttr.in/Moon@2016-12-25
 
-The Moon phase information uses [pyphoon](https://github.com/chubin/pyphoon) as its backend.
+The moon phase information uses [pyphoon](https://github.com/chubin/pyphoon) as its backend.
 
 To get the moon phase information in the online mode, use `%m`:
 
     $ curl wttr.in/London?format=%m
     🌖
 
-Keep in mind that the Unicode representation of moonphases suffers 2 caveats:
+Keep in mind that the Unicode representation of moon phases suffers 2 caveats:
 
 - With some fonts, the representation `🌘` is ambiguous, for it either seem
   almost-shadowed or almost-lit, depending on whether your terminal is in
@@ -483,7 +543,7 @@ The third option is to choose the language using the DNS name used in the query:
 
 wttr.in is currently translated into 54 languages, and the number of supported languages is constantly growing.
 
-See [/:translation](http://wttr.in/:translation) to learn more about the translation process,
+See [/:translation](https://wttr.in/:translation) to learn more about the translation process,
 to see the list of supported languages and contributors, or to know how you can help to translate wttr.in
 in your language.
 
@@ -495,7 +555,7 @@ There are currently two Windows related issues that prevent the examples found o
 
 ### Garbage characters in the output
 There is a limitation of the current Win32 version of `curl`. Until the [Win32 curl issue](https://github.com/chubin/wttr.in/issues/18#issuecomment-474145551) is resolved and rolled out in a future Windows release, it is recommended that you use Powershell’s `Invoke-Web-Request` command instead:
-- `(Invoke-WebRequest http://wttr.in).Content`
+- `(Invoke-WebRequest https://wttr.in).Content`
 
 ### Missing or double wide diagonal wind direction characters
 The second issue is regarding the width of the diagonal arrow glyphs that some Windows Terminal Applications such as the default `conhost.exe` use. At the time of writing this, `ConEmu.exe`, `ConEmu64.exe` and Terminal Applications built on top of ConEmu such as Cmder (`cmder.exe`) use these double-wide glyphs by default. The result is the same with all of these programs, either a missing character for certain wind directions or a broken table in the output or both. Some third-party Terminal Applications have addressed the wind direction glyph issue but that fix depends on the font and the Terminal Application you are using.

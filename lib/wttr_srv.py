@@ -210,6 +210,9 @@ def _response(parsed_query, query, fast_mode=False):
     # so we handle it with all available logic
     loc = (parsed_query['orig_location'] or "").lower()
     if parsed_query.get("view"):
+        if not parsed_query.get("location"):
+            parsed_query["location"] = loc
+
         output = wttr_line(query, parsed_query)
     elif loc == 'moon' or loc.startswith('moon@'):
         output = get_moon(parsed_query)
@@ -375,6 +378,8 @@ def wttr(location, request):
         if not response:
             parsed_query = parse_request(location, request, query)
             response = _response(parsed_query, query)
+            #if not response or (isinstance(response, str) and not response.strip()):
+            #    return RuntimeError("Empty answer")
 
             if parsed_query["location"] == NOT_FOUND_LOCATION:
                 http_code = 404

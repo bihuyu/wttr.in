@@ -147,6 +147,28 @@ WEATHER_SYMBOL_WI_NIGHT = {
     "VeryCloudy": "",
 }
 
+WEATHER_SYMBOL_PLAIN = {
+    "Unknown":             "?",
+    "Cloudy":              "mm",
+    "Fog":                 "=",
+    "HeavyRain":           "///",
+    "HeavyShowers":        "//",
+    "HeavySnow":           "**",
+    "HeavySnowShowers":    "*/*",
+    "LightRain":           "/",
+    "LightShowers":        ".",
+    "LightSleet":          "x",
+    "LightSleetShowers":   "x/",
+    "LightSnow":           "*",
+    "LightSnowShowers":    "*/",
+    "PartlyCloudy":        "m",
+    "Sunny":               "o",
+    "ThunderyHeavyRain":   "/!/",
+    "ThunderyShowers":     "!/",
+    "ThunderySnowShowers": "*!*",
+    "VeryCloudy": "mmm",
+}
+
 WEATHER_SYMBOL_WIDTH_VTE_WI = {
 }
 
@@ -294,5 +316,5 @@ LOCALE = {
     "nn": "nn_NO", "pt": "pt_PT", "pt-br":"pt_BR", "pl": "pl_PL", "ro": "ro_RO",
     "ru": "ru_RU", "sv": "sv_SE", "sk": "sk_SK", "sl": "sl_SI", "sr": "sr_RS",
     "sr-lat": "sr_RS@latin", "sw": "sw_KE", "th": "th_TH", "tr": "tr_TR", "uk": "uk_UA",
-    "uz": "uz_UZ", "vi": "vi_VN", "zh": "zh_TW", "zu": "zu_ZA",
+    "uz": "uz_UZ", "vi": "vi_VN", "zh": "zh_TW", "zu": "zu_ZA", "mg": "mg_MG",
 }
